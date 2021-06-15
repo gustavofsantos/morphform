@@ -17,7 +17,5 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Run tests
+      - name: Run next lint
         run: yarn lint
-        env:
-          CI: true

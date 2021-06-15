@@ -1,10 +1,10 @@
-import HomePage from ".";
-import { render, screen } from "@testing-library/react";
+import HomePage from "."
+import { render, screen } from "@testing-library/react"
 
 describe(HomePage.name, () => {
   it("Should mount", () => {
-    render(<HomePage />);
+    render(<HomePage />)
 
-    expect(screen.getByText(/home page/i)).toBeInTheDocument();
-  });
-});
+    expect(screen.getByText(/home page/i)).toBeInTheDocument()
+  })
+})
