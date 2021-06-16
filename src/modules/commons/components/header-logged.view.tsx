@@ -9,8 +9,8 @@ interface Props {
 
 export function HeaderLoggedView(props: Props) {
   return (
-    <Box as="nav">
-      <UnorderedList>
+    <Box as="nav" display="flex">
+      <UnorderedList listStyleType="none">
         <ListItem>
           <NextLink href="/admin/forms/new">
             <Link>Create</Link>
