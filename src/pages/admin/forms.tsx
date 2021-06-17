@@ -6,7 +6,6 @@ import { useFormsQuery } from "~/forms/hooks/use-forms"
 
 function FormsPage() {
   const formsQuery = useFormsQuery("gustavofsantos@outlook.com")
-  console.log(formsQuery)
 
   return (
     <Box>

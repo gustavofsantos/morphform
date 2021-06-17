@@ -3,7 +3,6 @@ import { Mongo } from "~/db/clients/mongo-client"
 
 const handle: NextApiHandler = async (req, res) => {
   const { email, formId } = req.body
-  console.log({ email, formId })
 
   const [draftsColl] = await Mongo.getCollection("drafts")
   const draftForm = await draftsColl.findOne({

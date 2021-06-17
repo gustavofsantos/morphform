@@ -40,9 +40,7 @@ function MakePublic() {
     if (mutation.isSuccess) {
       router.push("/admin/forms")
     }
-  }, [mutation.isSuccess])
-
-  console.log({ session, isLoading })
+  }, [mutation.isSuccess, router])
 
   return (
     <Button
@@ -86,8 +84,6 @@ function FormPages() {
 function FormPageEditor({ pageId }) {
   const { getPage, setPageTitle, setPageDescription } = useFormBuilder()
   const page = getPage(pageId)
-
-  console.log(FormPageEditor.name, { pageId, page })
 
   if (!page) return null
 
