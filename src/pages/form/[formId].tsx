@@ -1,6 +1,6 @@
 import { NextPageContext } from "next"
 import Head from "next/head"
-import React from "react"
+import { Fragment, useState } from "react"
 import {
   Box,
   Button,
@@ -16,42 +16,9 @@ import {
 } from "@chakra-ui/react"
 import { When } from "~/commons/components"
 import { FormService } from "~/forms/services/form.service"
-import produce from "immer"
 
-const FormStateContext = React.createContext(null)
-
-const FormStateProvider = ({ children }) => {
-  const [state, setState] = React.useState({})
-
-  return (
-    <FormStateContext.Provider value={{ state, setState }}>
-      {children}
-    </FormStateContext.Provider>
-  )
-}
-
-const useFormState = () => {
-  const { state, setState } = React.useContext(FormStateContext)
-
-  const getState = () => state
-
-  const setFieldValue = ({ pageId, fieldName, value }) => {
-    setState(
-      produce(state, (draft) => {
-        draft[pageId][fieldName] = value
-      })
-    )
-  }
-
-  const fieldValue = ({ pageId, fieldName }) => {
-    return state[pageId]?.[fieldName] ?? undefined
-  }
-
-  return { getState, fieldValue, setFieldValue }
-}
-
-function FormPage({ form }) {
-  const [pageIndex, setPageIndex] = React.useState(0)
+export default function FormPage({ form }) {
+  const [pageIndex, setPageIndex] = useState(0)
   const handleNext = () => setPageIndex(pageIndex + 1)
 
   return (
@@ -96,16 +63,7 @@ function FormPage({ form }) {
   )
 }
 
-export default function WrappedFormPage(props) {
-  return (
-    <FormStateProvider>
-      <FormPage {...props} />
-    </FormStateProvider>
-  )
-}
-
 function FormStepPage({ id, title, description, fields, isHidden, isLast, onNext }) {
-  const { fieldValue, setFieldValue } = useFormState()
   return (
     <Box as="section" id={id} hidden={isHidden}>
       <Box as="section" pb="6">
@@ -117,20 +75,12 @@ function FormStepPage({ id, title, description, fields, isHidden, isLast, onNext
 
       <FormControl as="fieldset" id={id} name={id}>
         {fields.map((field) => (
-          <React.Fragment>
+          <Fragment key={field.label}>
             <When value={field.type === "text"}>
               <FormControl id={`pages[${id}][${field.name}]`} isRequired>
                 <Input
                   name={`pages[${id}][${field.label}]`}
                   placeholder={field.label}
-                  /* value={fieldValue({ pageId: id, fieldName: field.label })}
-                  onChange={(ev) =>
-                    setFieldValue({
-                      pageId: id,
-                      fieldName: field.label,
-                      value: ev.target.value
-                    })
-                  } */
                   type="text"
                 />
               </FormControl>
@@ -139,17 +89,7 @@ function FormStepPage({ id, title, description, fields, isHidden, isLast, onNext
               {() => (
                 <FormControl as="fieldset" isRequired>
                   <FormLabel>{field.label}</FormLabel>
-                  <RadioGroup
-                    name={`pages[${id}][${field.label}]`}
-                    /* value={fieldValue({ pageId: id, fieldName: field.label })}
-                    onChange={(value) =>
-                      setFieldValue({
-                        pageId: id,
-                        fieldName: field.label,
-                        value
-                      })
-                    } */
-                  >
+                  <RadioGroup name={`pages[${id}][${field.label}]`}>
                     <VStack>
                       {field.options.map((optionName) => (
                         <Radio key={optionName} value={optionName}>
@@ -161,7 +101,7 @@ function FormStepPage({ id, title, description, fields, isHidden, isLast, onNext
                 </FormControl>
               )}
             </When>
-          </React.Fragment>
+          </Fragment>
         ))}
       </FormControl>
 

@@ -1,5 +1,4 @@
 import { Box, Text } from "@chakra-ui/react"
-import { useSession } from "next-auth/client"
 import Link from "next/link"
 import { withAuthBarier } from "~/auth/hocs/with-auth-barier"
 import { When } from "~/commons/components"

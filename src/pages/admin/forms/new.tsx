@@ -1,5 +1,4 @@
 import { Box, Button, Container, Heading, Input, Text } from "@chakra-ui/react"
-import { useSession } from "next-auth/client"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
