@@ -1,9 +1,6 @@
-import { useMachine } from "@xstate/react"
-import { useSession } from "next-auth/client"
 import { createContext, useContext, useEffect } from "react"
 import { State } from "xstate"
-import { useDebounce } from "~/commons/hooks/use-debounce"
-import { useFormDraftMutation } from "../hooks/use-form-draft-mutation"
+import { useMachine } from "@xstate/react"
 import {
   createFormBuilderMachine,
   FormBuilderMachineContext
@@ -28,15 +25,12 @@ export function FormBuilderProvider({ children, initialState = {} }) {
 
 export function useFormBuilder() {
   const { state, send } = useContext(FormBuilderContext)
-  const [session] = useSession()
-  const debouncedContext = useDebounce(state.context, 2000)
-  const mutation = useFormDraftMutation()
-
-  const pages = Object.values(state.context.pages)
+  const pages = state.context.pages
+  const _context = state.context
 
   const createPage = () => send({ type: "CREATE_PAGE" })
 
-  const getPage = (pageId) => state.context.pages[pageId]
+  const getPage = (pageId) => state.context.pages.find((page) => page.id === pageId)
 
   const name = state.context.name
   const id = state.context.id
@@ -53,19 +47,17 @@ export function useFormBuilder() {
   const setPageTitle = ({ pageId, title }) =>
     send({ type: "SET_PAGE_TITLE", data: { pageId, title } })
 
+  const setFieldLabel = ({ pageId, fieldIndex, label }) =>
+    send({ type: "SET_PAGE_FIELD_LABEL", data: { pageId, fieldIndex, label } })
+
   const setPageDescription = ({ pageId, description }) =>
     send({ type: "SET_PAGE_DESCRIPTION", data: { pageId, description } })
-
-  useEffect(() => {
-    if (session?.user) {
-      mutation.mutate({ email: session?.user?.email, formState: debouncedContext })
-    }
-  }, [debouncedContext, session])
 
   return {
     pages,
     name,
     formId: id,
+    _context,
 
     // functions
     getPage,
@@ -73,6 +65,7 @@ export function useFormBuilder() {
     setFormName,
     setPageType,
     setPageTitle,
+    setFieldLabel,
     setPageDescription
   }
 }

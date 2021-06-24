@@ -1,12 +1,13 @@
 import { Box, Button, Container, Heading, Input, Text } from "@chakra-ui/react"
+import { useSession } from "next-auth/client"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 import { withAuthBarier } from "~/auth/hocs/with-auth-barier"
 import { FormBuilderProvider, useFormBuilder } from "~/forms/contexts/form-builder"
-import { useMakeDraftPublicMutation } from "~/forms/hooks/use-make-draft-public-mutation"
+import { useCreateForm } from "~/forms/hooks/use-create-form"
 
-function NewFormPage() {
+function NewFormPage({ user }) {
   const router = useRouter()
   const pageId = router.query.pageId
 
@@ -18,8 +19,7 @@ function NewFormPage() {
           <FormPages />
           <Box as="article">
             <FormPageEditor pageId={pageId} />
-
-            <MakePublic />
+            <MakePublic user={user} />
           </Box>
         </Container>
       </Box>
@@ -29,10 +29,12 @@ function NewFormPage() {
 
 export default withAuthBarier(NewFormPage)
 
-function MakePublic() {
-  const { formId } = useFormBuilder()
+function MakePublic({ user }) {
+  const { _context } = useFormBuilder()
   const router = useRouter()
-  const mutation = useMakeDraftPublicMutation()
+  const mutation = useCreateForm()
+
+  const handleCreate = () => mutation.mutate({ userEmail: user?.email, form: _context })
 
   useEffect(() => {
     if (mutation.isSuccess) {
@@ -41,11 +43,8 @@ function MakePublic() {
   }, [mutation.isSuccess, router])
 
   return (
-    <Button
-      isLoading={mutation.isLoading}
-      onClick={() => mutation.mutate({ email: "gustavofsantos@outlook.com", formId })}
-    >
-      Make Public
+    <Button isLoading={mutation.isLoading} onClick={handleCreate}>
+      Create
     </Button>
   )
 }
@@ -80,7 +79,7 @@ function FormPages() {
 }
 
 function FormPageEditor({ pageId }) {
-  const { getPage, setPageTitle, setPageDescription } = useFormBuilder()
+  const { getPage, setPageTitle, setPageDescription, setFieldLabel } = useFormBuilder()
   const page = getPage(pageId)
 
   if (!page) return null
@@ -95,6 +94,20 @@ function FormPageEditor({ pageId }) {
         value={page.description}
         onChange={(ev) => setPageDescription({ pageId, description: ev.target.value })}
       />
+
+      <Box>
+        <Heading as="h4">Inputs</Heading>
+        {page.fields.map((field, index) => (
+          <Input
+            key={`field-${index}`}
+            placeholder="Label"
+            value={field.label}
+            onChange={(ev) =>
+              setFieldLabel({ pageId, fieldIndex: index, label: ev.target.value })
+            }
+          />
+        ))}
+      </Box>
     </Box>
   )
 }

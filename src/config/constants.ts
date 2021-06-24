@@ -1,4 +1,5 @@
 export const Collections = {
   drafts: "drafts",
-  forms: "forms"
+  forms: "forms",
+  users: "users"
 }

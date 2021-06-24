@@ -1,6 +1,7 @@
 import { signIn, signOut, useSession } from "next-auth/client"
-import { Box, Container } from "@chakra-ui/react"
+import { Box, Container, Text } from "@chakra-ui/react"
 import { When } from "~/commons/components"
+import Link from "next/link"
 
 export default function HomePage() {
   const [session, isLoading] = useSession()
@@ -18,6 +19,9 @@ export default function HomePage() {
         </When>
         <When value={!!session?.user && !isLoading}>
           <button onClick={handleSignOut}>Log out</button>
+          <Link href="/admin">
+            <Text as="a">Dashboard</Text>
+          </Link>
         </When>
       </Container>
     </Box>

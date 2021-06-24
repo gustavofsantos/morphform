@@ -15,7 +15,7 @@ export function withAuthBarier(Component) {
 
     if (isLoading) return <span>loading...</span>
 
-    return <Component {...props} />
+    return <Component {...props} user={session.user} />
   }
 
   Enhanced.displayName = `withAuthBarier(${Component.displayName ?? Component.name})`

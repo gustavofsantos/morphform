@@ -11,7 +11,7 @@ import {
 export type FormBuilderMachineContext = {
   id: string
   name: string
-  pages: Record<string, FormPage>
+  pages: Array<FormPage>
 }
 
 export function createFormBuilderMachine(initialState = {}) {
@@ -20,7 +20,7 @@ export function createFormBuilderMachine(initialState = {}) {
     context: {
       id: uuidv4(),
       name: "",
-      pages: {}
+      pages: []
     },
     initial: "building",
     states: {
@@ -31,10 +31,8 @@ export function createFormBuilderMachine(initialState = {}) {
             actions: assign({
               pages: (ctx, ev) => {
                 const newPage = createDefaultTextPage()
-                return {
-                  ...ctx.pages,
-                  [newPage.id]: newPage
-                }
+
+                return [...ctx.pages, newPage]
               }
             })
           },
@@ -46,54 +44,53 @@ export function createFormBuilderMachine(initialState = {}) {
           SET_PAGE_TYPE: {
             actions: assign({
               pages: (ctx, ev) => {
-                let page
-                switch (ev.data.type) {
-                  case "text":
-                    page = createDefaultTextPage()
-                    break
-                  case "text-area":
-                    page = createDefaultTextAreaPage()
-                    break
-                  case "single-select":
-                    page = createDefaultSingleSelectPage()
-                    break
-                  default:
-                    page = ctx.pages[ev.data.pageId]
-                }
-
-                page.id = ctx.pages[ev.data.pageId].id
-                return {
-                  ...ctx.pages,
-                  [page.id]: page
-                }
+                return produce(ctx.pages, (draft) => {
+                  let page
+                  switch (ev.data.type) {
+                    case "text":
+                      page = createDefaultTextPage()
+                      break
+                    case "text-area":
+                      page = createDefaultTextAreaPage()
+                      break
+                    case "single-select":
+                      page = createDefaultSingleSelectPage()
+                      break
+                    default:
+                      page = draft.find((page) => page.id === ev.data.pageId)
+                  }
+                  page.id = ev.data.pageId
+                })
               }
             })
           },
           SET_PAGE_TITLE: {
             actions: assign({
               pages: (ctx, ev) => {
-                const page = produce(ctx.pages[ev.data.pageId], (draft) => {
-                  draft.title = ev.data.title
+                return produce(ctx.pages, (draft) => {
+                  const page = draft.find((page) => page.id === ev.data.pageId)
+                  page.title = ev.data.title
                 })
-
-                return {
-                  ...ctx.pages,
-                  [page.id]: page
-                }
               }
             })
           },
           SET_PAGE_DESCRIPTION: {
             actions: assign({
               pages: (ctx, ev) => {
-                const page = produce(ctx.pages[ev.data.pageId], (draft) => {
-                  draft.description = ev.data.description
+                return produce(ctx.pages, (draft) => {
+                  const page = draft.find((page) => page.id === ev.data.pageId)
+                  page.description = ev.data.description
                 })
-
-                return {
-                  ...ctx.pages,
-                  [page.id]: page
-                }
+              }
+            })
+          },
+          SET_PAGE_FIELD_LABEL: {
+            actions: assign({
+              pages: (ctx, ev) => {
+                return produce(ctx.pages, (draft) => {
+                  const page = draft.find((page) => page.id === ev.data.pageId)
+                  page.fields[ev.data.fieldIndex].label = ev.data.label
+                })
               }
             })
           }

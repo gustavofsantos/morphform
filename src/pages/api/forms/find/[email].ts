@@ -1,12 +1,15 @@
+import { Cursor } from "mongodb"
 import { NextApiHandler } from "next"
 import { Mongo } from "~/db/clients/mongo-client"
+import { FormService } from "~/forms/services/form.service"
 
 const handler: NextApiHandler = async (req, res) => {
-  const [coll] = await Mongo.getCollection("forms")
-  const forms = await coll
-    .find({ email: req.query.email })
+  const allForms = await FormService.list(req.query.email as string)
+  const forms = await (allForms as Cursor)
     .map((f) => ({ ...f, _id: f._id.toString() }))
     .toArray()
+
+  console.log({ forms })
 
   res.json(forms)
   res.end()

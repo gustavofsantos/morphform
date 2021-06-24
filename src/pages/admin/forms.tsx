@@ -1,11 +1,12 @@
 import { Box, Text } from "@chakra-ui/react"
+import { useSession } from "next-auth/client"
 import Link from "next/link"
 import { withAuthBarier } from "~/auth/hocs/with-auth-barier"
 import { When } from "~/commons/components"
 import { useFormsQuery } from "~/forms/hooks/use-forms"
 
-function FormsPage() {
-  const formsQuery = useFormsQuery("gustavofsantos@outlook.com")
+function FormsPage({ user }) {
+  const formsQuery = useFormsQuery(user?.email)
 
   return (
     <Box>
@@ -19,7 +20,7 @@ function FormsPage() {
           formsQuery.data.map((form) => (
             <Box key={form._id}>
               <Link href={`/admin/forms/edit/${form._id}`} passHref>
-                <Text>{form.state.name}</Text>
+                <Text>{form.form.name}</Text>
               </Link>
             </Box>
           ))
