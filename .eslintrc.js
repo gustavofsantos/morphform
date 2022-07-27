@@ -21,6 +21,7 @@ module.exports = {
     }
   },
   rules: {
+    "no-console": 2,
     quotes: ["warn", "double"],
     "space-before-function-paren": "off",
 
